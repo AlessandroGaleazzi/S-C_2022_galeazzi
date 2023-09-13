@@ -11,6 +11,8 @@ def get_seconds(time_str):
     return int(hh) * 3600 + int(mm) * 60 + int(ss)
 
 def find_extreme_points(point1, point2, logging_time, df_temp_time):
+    #Think about the possible tests and doc
+
     time1, time2 = point1 * logging_time, point2 * logging_time
     temp1 = df_temp_time.iloc[point1]["Unnamed: 2"]
     temp2 = df_temp_time.iloc[point2]["Unnamed: 2"]
@@ -47,11 +49,12 @@ point2 = 7660
 
 temp_for_fit = np.array(df_temp_time.iloc[point1:point2]["Unnamed: 2"])
 time_for_fit = np.arange(len(temp_for_fit)) * logging_time
-temp_vs_time = np.array([time, temp])
-highlight_points=find_extreme_points(point1, point2, logging_time, df_temp_time)
-#print(highlight_points)
 
-#print(temp_vs_time)
+#temp_vs_time = np.array([time, temp])
+#Serve a qualcosa? non lo uso mai nel progetto
+
+highlight_points=find_extreme_points(point1, point2, logging_time, df_temp_time)
+
 """
 plt.plot(time, temp, label="Preliminary check")
 
@@ -80,4 +83,4 @@ plt.legend()
 plt.grid()
 plt.show()
 
-print(f'The exponential fit calculated tau={tau:.2f}s')
+#print(f'The exponential fit calculated tau={tau_free:.2f}s (all parameters free)/nThe exponential fit calculated tau={tau_fixed:.2f}s (temperature parameters fixed)')
