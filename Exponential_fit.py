@@ -83,4 +83,4 @@ plt.legend()
 plt.grid()
 plt.show()
 
-#print(f'The exponential fit calculated tau={tau_free:.2f}s (all parameters free)/nThe exponential fit calculated tau={tau_fixed:.2f}s (temperature parameters fixed)')
+print(f'The exponential fit calculated tau={tau:.2f}s')
