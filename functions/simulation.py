@@ -3,38 +3,43 @@ import matplotlib.pyplot as plt
 
 
 class TemperatureError(Exception):
-    #is this the way I should write my own exceptions?
+    # is this the way I should write my own exceptions?
     pass
 
 
 def get_seconds(time_str):
     # This function transforms a time in format hh:mm:ss into seconds
-    #exception: if anything but numbers and : is present, raise an exception. same for mm, ss > 60
+    # exception: if anything but numbers and : is present, raise an exception. same for mm, ss > 60
+
     hh, mm, ss = time_str.split(':')
     return int(hh) * 3600 + int(mm) * 60 + int(ss)
 
+
 def exponential_func(t, t0, teq, tau):
-    #This function represent the time evolution of a system in a thermal bath, as described in the theoretical part of the documentation. (STILL TO WRITE)
-    return teq +(t0-teq)*np.exp(-t/tau)
+    # This function represent the time evolution of a system in a thermal bath, as described in the theoretical part of the documentation. (STILL TO WRITE)
+    return teq + (t0-teq)*np.exp(-t/tau)
+
 
 def time_to_threshold_temp(t0, teq, tau, threshold_temp, interval_time):
 
-    #This function calculate the time needed to reach a certain threshold temperature, given the time between temperatures and all the system and environmental parameters
-    
+    # This function calculate the time needed to reach a certain threshold temperature, given the time between temperatures and all the system and environmental parameters
+
     if ((t0 < teq) and (threshold_temp > teq)) or ((t0 > teq) and (threshold_temp < teq)):
-        raise TemperatureError("The threshold temperature is beyond equilibrium temperature, therefore it will never be reached . Check again your parameters.")
-    
+        raise TemperatureError(
+            "The threshold temperature is beyond equilibrium temperature, therefore it will never be reached . Check again your parameters.")
+
     if threshold_temp == teq:
-        raise TemperatureError("The threshold temperature that was set is equal to the external temperature, meaning that it will be reached asimptotically. ")
-        
+        raise TemperatureError(
+            "The threshold temperature that was set is equal to the external temperature, meaning that it will be reached asimptotically. ")
+
     counter = 1
     time, temp = interval_time, t0
-    
+
     if threshold_temp < teq:
         while (temp < threshold_temp):
             temp = exponential_func(time, t0, teq, tau)
             counter += 1
-            time = counter * interval_time   
+            time = counter * interval_time
     else:
         while (temp > threshold_temp):
             temp = exponential_func(time, t0, teq, tau)
@@ -43,45 +48,50 @@ def time_to_threshold_temp(t0, teq, tau, threshold_temp, interval_time):
     return time
 
 
-
 def before_sunrise_temperature_function(Tmin, Tsunset, sunset_time, b, n1, time):
-    #function for temperature calculation during daytime
+    # function for temperature calculation during daytime
 
-    return Tmin + (Tsunset-Tmin) * np.exp( - b * ( time - get_seconds(sunset_time) + 24*3600 ) / n1 ) - ( time - get_seconds(sunset_time) + 24*3600 ) / n1 * np.exp( - b )
+    return Tmin + (Tsunset-Tmin) * np.exp(- b * (time - get_seconds(sunset_time) + 24*3600) / n1) - (time - get_seconds(sunset_time) + 24*3600) / n1 * np.exp(- b)
+
 
 def daytime_temperature_function(Tmin, Tmax, sunrise_time, sunset_time, a, c, time):
-    #function for temperature calculation between sunrise and sunset
+    # function for temperature calculation between sunrise and sunset
 
-    return Tmin + ( Tmax - Tmin) * np.sin( np.pi * ( time  ) / ( get_seconds(sunset_time) - get_seconds(sunrise_time) + 2 * ( a - c ) * 3600))
+    return Tmin + (Tmax - Tmin) * np.sin(np.pi * (time) / (get_seconds(sunset_time) - get_seconds(sunrise_time) + 2 * (a - c) * 3600))
+
 
 def after_sunset_temperature_function(Tmin, Tsunset, b, n2, time):
-    #function for temperature calculation after sunset
-    
-    return Tmin + (Tsunset - Tmin) * np.exp(- b * ( time  ) / n2 ) - ( time ) / n2 * np.exp( - b )
+    # function for temperature calculation after sunset
+
+    return Tmin + (Tsunset - Tmin) * np.exp(- b * (time) / n2) - (time) / n2 * np.exp(- b)
 
 
-
-
-def one_day_temperature_calculation(Tmin, Tmax, sunrise_time="6:52:00", sunset_time="19:26:00", a = 2.71, b = 3.14, c = 0.75 ):
-    #Function that calculates how the external temperature varies in one day, given certain parameters.  
+def one_day_temperature_calculation(Tmin, Tmax, sunrise_time="6:52:00", sunset_time="19:26:00", a=2.71, b=3.14, c=0.75):
+    # Function that calculates how the external temperature varies in one day, given certain parameters.
     all_day_temperatures = []
-    
-    #determine initial parameters from input values
-    Tsunset = daytime_temperature_function(Tmin, Tmax, sunrise_time, sunset_time, a, c, int( get_seconds(sunset_time)- get_seconds(sunrise_time) - c * 3600 ))  #CHECK THE TIME, REMEMBER THAT IS SHIFTED BY ""
-    n1 = get_seconds(sunrise_time) - get_seconds(sunset_time) + ( c + 24 ) * 3600
-    n2 = get_seconds(sunrise_time) - get_seconds(sunset_time) + ( c + 24 ) * 3600      #they are the same, since they are meant for simulations in which the parameters change as days go by. Maybe I'll need it later 
-    
+
+    # Determine initial parameters from input values
+    Tsunset = daytime_temperature_function(Tmin, Tmax, sunrise_time, sunset_time, a, c, int(get_seconds(
+        sunset_time) - get_seconds(sunrise_time) - c * 3600))
+    n1 = get_seconds(sunrise_time) - \
+        get_seconds(sunset_time) + (c + 24) * 3600
+    # n1 and n2 are the same, since they are meant for simulations in which the parameters change as days go by. Maybe I'll need it later
+    n2 = get_seconds(sunrise_time) - \
+        get_seconds(sunset_time) + (c + 24) * 3600
+
     for t in range(int(get_seconds(sunrise_time) + c * 3600)):
-        all_day_temperatures.append(before_sunrise_temperature_function(Tmin, Tsunset, sunset_time, b, n1, t))
+        all_day_temperatures.append(before_sunrise_temperature_function(
+            Tmin, Tsunset, sunset_time, b, n1, t))
     for t in range(int(get_seconds(sunset_time) - get_seconds(sunrise_time) - c * 3600)):
-        all_day_temperatures.append(daytime_temperature_function(Tmin, Tmax, sunrise_time, sunset_time, a, c, t))
+        all_day_temperatures.append(daytime_temperature_function(
+            Tmin, Tmax, sunrise_time, sunset_time, a, c, t))
     for t in range(24 * 3600 - get_seconds(sunset_time)):
-        all_day_temperatures.append(after_sunset_temperature_function(Tmin, Tsunset, b, n2, t))
+        all_day_temperatures.append(
+            after_sunset_temperature_function(Tmin, Tsunset, b, n2, t))
     return all_day_temperatures
 
 
-
-#Example of use of time_to_threshold_temperature
+# Example of use of time_to_threshold_temperature
 """
 try:
     print(time_to_threshold_temp(-18, 27, 1020, 25, 10))
@@ -90,7 +100,7 @@ except TemperatureError as e:
 """
 
 
-#Example of external temperature simulation
+# Example of external temperature simulation
 """
 temperatures_in_one_day = one_day_temperature_calculation(Tmin = 13, Tmax = 25, sunrise_time="6:52:00", sunset_time="19:26:00")
 seconds_in_one_day = np.arange(24 * 3600)
