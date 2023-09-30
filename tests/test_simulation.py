@@ -1,4 +1,5 @@
 import functions.simulation as sim
+# Why it does not recognize the module?
 
 
 # Definition of class for testing
@@ -17,6 +18,14 @@ def test_exponential_func():
     # As time goes by, temperature should always get closer to teq
     assert (sim.exponential_func(1000, -10, 20, 1000) <
             sim.exponential_func(10000, -10, 20, 1000)) == True
+
+
+def test_every_second_exponential_func():
+    # Make sure that it is just the same function as exponentials_func, but with t=1
+    assert sim.exponential_func(
+        1, -10, 20, 1000) == sim.every_second_exponential_func(-10, 20, 1000)
+    assert sim.exponential_func(
+        1, 10, 30, 100) == sim.every_second_exponential_func(10, 30, 100)
 
 
 def test_time_to_threshold_temp():
@@ -62,3 +71,13 @@ def test_one_day_temperature_calculation():
     # The function should return an array with 24*3600 values, meaning that every second of the day has a correspondent temperature
     assert len(sim.one_day_temperature_calculation(10, 30, sunrise_time="6:52:00",
                sunset_time="19:26:00", a=2.71, b=3.14, c=0.75)) == 24*3600
+
+
+def test_temperature_simulation_with_variable_ext_temperature():
+    # This function should return a list whose length corresponds to the duration of the simulation (which is a parameter)
+    temperatures_in_one_day = sim.one_day_temperature_calculation(
+        Tmin=13, Tmax=25, sunrise_time="6:52:00", sunset_time="19:26:00")
+    assert len(sim.temperature_simulation_with_variable_ext_temperature(
+        "00:00:00", -18, 10000, "24:00:00", temperatures_in_one_day)) == sim.get_seconds("24:00:00")
+
+    # This function should work just like time_to_threshold, but to test it i need to produce a graphical version of time_to_threshold... TO DO!!!
