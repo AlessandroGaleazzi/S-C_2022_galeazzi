@@ -2,7 +2,20 @@ import functions.simulation as sim
 # Why it does not recognize the module?
 
 
-# Definition of class for testing
+def is_monotonic(list):
+    # This function assesses if a list is monotonic. I wrote it to perform a test in this script
+
+    increasing = decreasing = True
+
+    for i in range(1, len(list)):
+        if list[i] < list[i - 1]:
+            increasing = False
+        if list[i] > list[i - 1]:
+            decreasing = False
+
+    return increasing or decreasing
+
+
 def test_get_seconds():
     # Midnight should always return 0 seconds
     assert sim.get_seconds("00:00:00") == 0
@@ -39,6 +52,20 @@ def test_time_to_threshold_temp():
     # The function should return the same result both for increasing and decreasing temperatures, in the same conditions
     assert sim.time_to_threshold_temp(-20, 30, 1000, 25,
                                       10) == sim.time_to_threshold_temp(30, -20, 1000, -15, 10)
+
+
+def test_temperature_evolution_up_to_threshold():
+    # Given the same external conditions, the list returned by simulation performed to reach a higher threshold temperature should be higher
+    assert (len(sim.temperature_evolution_up_to_threshold(-20, 30, 1000, 25)) <
+            len(sim.temperature_evolution_up_to_threshold(-20, 30, 1000, 28))) == True
+
+    # The function should return two lists with the same length both for increasing and decreasing temperatures, in the same conditions
+    assert len(sim.temperature_evolution_up_to_threshold(-20, 30, 1000, 25
+                                                         )) == len(sim.temperature_evolution_up_to_threshold(30, -20, 1000, -15))
+
+    # The list returned by the function should be monotonic
+    assert is_monotonic(
+        sim.temperature_evolution_up_to_threshold(-20, 30, 1000, 25)) == True
 
 
 def test_before_sunrise_temperature_function():

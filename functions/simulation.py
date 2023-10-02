@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
 
 
 class TemperatureError(Exception):
@@ -26,12 +25,11 @@ def every_second_exponential_func(t0, teq, tau):
 
 
 def time_to_threshold_temp(t0, teq, tau, threshold_temp, interval_time):
-
-    # This function calculate the time needed to reach a certain threshold temperature, given the time between temperatures and all the system and environmental parameters
+    # This function calculate the time needed to reach a certain threshold temperature, given the time between measurements and all the system and environmental parameters
 
     if ((t0 < teq) and (threshold_temp > teq)) or ((t0 > teq) and (threshold_temp < teq)):
         raise TemperatureError(
-            "The threshold temperature is beyond equilibrium temperature, therefore it will never be reached . Check again your parameters.")
+            "The threshold temperature is beyond equilibrium temperature, therefore it will never be reached. Check again your parameters.")
 
     if threshold_temp == teq:
         raise TemperatureError(
@@ -51,6 +49,37 @@ def time_to_threshold_temp(t0, teq, tau, threshold_temp, interval_time):
             counter += 1
             time = counter * interval_time
     return time
+
+
+def temperature_evolution_up_to_threshold(initial_t0, teq, tau, threshold_temp):
+    # This function simulates the temperature evolution as the system reaches a certain threshold temperature, given the time between measurements and all the system and environmental parameters
+
+    if ((initial_t0 < teq) and (threshold_temp > teq)) or ((initial_t0 > teq) and (threshold_temp < teq)):
+        raise TemperatureError(
+            "The threshold temperature is beyond equilibrium temperature, therefore it will never be reached. Check again your parameters.")
+
+    if threshold_temp == teq:
+        raise TemperatureError(
+            "The threshold temperature that was set is equal to the external temperature, meaning that it will be reached asimptotically. ")
+
+    system_temperature = []
+    system_temperature.append(initial_t0)
+    t0, temp = initial_t0, initial_t0
+    counter = 0
+
+    if threshold_temp < teq:
+        while (temp < threshold_temp):
+            temp = every_second_exponential_func(t0, teq, tau)
+            system_temperature.append(temp)
+            t0 = system_temperature[counter + 1]
+            counter += 1
+    else:
+        while (temp > threshold_temp):
+            temp = every_second_exponential_func(t0, teq, tau)
+            system_temperature.append(temp)
+            t0 = system_temperature[counter + 1]
+            counter += 1
+    return system_temperature
 
 
 def before_sunrise_temperature_function(Tmin, Tsunset, sunset_time, b, n1, time):
