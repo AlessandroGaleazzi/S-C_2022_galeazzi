@@ -1,22 +1,41 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
-
 from scipy.optimize import curve_fit
+
+# HACK
 
 
 def get_seconds(time_str):
-    # see how to import this function from simulation.py, since they are just the same
-    # exception: if anything but numbers and : is present, raise an exception. same for mm, ss > 60
+    """This function transforms a time in format hh:mm:ss into a time measured in seconds.
 
-    hh, mm, ss = time_str.split(
-        ':')
+    Parameters:
+        time_str : time in format hh:mm:ss.
+
+    Returns:
+        Value of the input time in seconds.
+
+    Raise:
+        ValueError if the input string contains anything but digits and colons."""
+    for char in time_str:
+        if not char.isdigit() and char != ':':
+            raise ValueError(
+                "Invalid character in time format. Only digits and colons are allowed.")
+    hh, mm, ss = time_str.split(':')
     return int(hh) * 3600 + int(mm) * 60 + int(ss)
 
 
 def find_extreme_points(point1, point2, logging_time, df_temp_time):
-    # Think about the possible tests and doc
+    """This function returns the two points (begin and end) to be used to fit data.
 
+    Parameters:
+        point1 : measurement number from which the fit starts.
+        point2 : last measurement number fro the fit.
+        logging_time : time between measurements.
+        df_temp_time : dataframe from which temperatures and time are extracted.
+
+    Returns:
+        2x2 array containing begin and end of the fitting interval."""
     time1, time2 = point1 * \
         logging_time, point2 * \
         logging_time
@@ -28,18 +47,28 @@ def find_extreme_points(point1, point2, logging_time, df_temp_time):
 
 
 def exponential_func(t, T0, Teq, tau):
+    """This function represents the time evolution of a system placed in a thermal bath.
+
+    Parameters:
+        t : time (s) after which I want to calculate the temperature of the system.
+        t0 : temperature of the system at t = 0
+        teq : temperature of the thermal bath
+        tau : time constant of the system (see documentation to better understand)
+
+    Returns:
+        Value of the system temperature after t seconds."""
     return Teq + (T0-Teq)*np.exp(-t/tau)
 
 
-# Input part (skipped at the moment, all parameters are already set). Maybe a config file would be better?
+# Input part (skipped at the moment, all parameters are already set). TODO Use a config file to perform the fit.
 
 
 """
 file_name = input("Hello! With this code, you will be able to calculate the time constant of your thermal container and use it to perform simulations. First, write the name of the excel file from which you want to calculate the time constant.")
 """
 file_name = "EFI234105840_20230801164648.xls"
-
-# i have to manage the case in which the file is not found. exception?
+if not file_name.endswith(".xls"):
+    raise ValueError(f"The file '{file_name}' is not a valid Excel file.")
 
 df_logging_time = pd.read_excel(
     file_name, usecols=[4], skiprows=9, nrows=1)

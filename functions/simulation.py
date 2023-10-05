@@ -1,63 +1,127 @@
 import numpy as np
 import pandas as pd
 
-
-class TemperatureError(Exception):
-    # is this the way I should write my own exceptions? Expand this to all the cases in the functions where an exception should be raised. TO DO!!!
-    pass
+# TODO Remember to check how to raise exceptions in the simulation (try and except). exceptions are written but if they are never raised they are useless!!!!
 
 
 # The next three functions were written to be used inside the functions that actually perform the simulations
 
 def get_seconds(time_str):
-    # This function transforms a time in format hh:mm:ss into seconds
-    # exception: if anything but numbers and : is present, raise an exception. same for mm, ss > 60
+    """This function transforms a time in format hh:mm:ss into a time measured in seconds.
 
+    Parameters:
+        time_str : time in format hh:mm:ss.
+
+    Returns:
+        Value of the input time in seconds.
+
+    Raise:
+        ValueError if the input string contains anything but digits and colons."""
+    for char in time_str:
+        if not char.isdigit() and char != ':':
+            raise ValueError(
+                "Invalid character in time format. Only digits and colons are allowed.")
     hh, mm, ss = time_str.split(':')
     return int(hh) * 3600 + int(mm) * 60 + int(ss)
 
 
 def exponential_func(t, t0, teq, tau):
-    # This function represent the time evolution of a system in a thermal bath, as described in the theoretical part of the documentation. (STILL TO WRITE)
+    """This function represents the time evolution of a system placed in a thermal bath.
+
+    Parameters:
+        t : time (s) after which I want to calculate the temperature of the system.
+        t0 : temperature of the system at t = 0
+        teq : temperature of the thermal bath
+        tau : time constant of the system (see documentation to better understand)
+
+    Returns:
+        Value of the system temperature after t seconds."""
     return teq + (t0-teq)*np.exp(-t/tau)
 
 
 def every_second_exponential_func(t0, teq, tau):
-    # This function represent the time evolution of a system in a thermal bath, calculated every second
+    """This function is the same as exponential_func, but with t set to 1.
+
+    Parameters:
+        t0 : temperature of the system at t = 0
+        teq : temperature of the thermal bath
+        tau : time constant of the system (see documentation to better understand)
+
+    Returns:
+        Value of the system temperature after one second."""
     return teq + (t0-teq)*np.exp(-1/tau)
 
 
 # The next four functions are used to produce a simulation of external temperatures in a day, according to the clear-sky model
 
 def before_sunrise_temperature_function(Tmin, Tsunset, sunset_time, b, n1, time):
-    # function for temperature calculation during daytime
+    """This function calculates the external temperature before sunrise.
 
+    Parameters:
+        Tmin : minimum temperature of the day.
+        Tsunset : temperature at sunset.
+        sunset_time : sunset time (string with format "hh:mm:ss").
+        b : night-time temperature decay coefficient.
+        n1 : corrected night length.
+        time : time since midnight (int, in seconds).
+
+    Returns:
+        Value of the external temperature before sunrise."""
     return Tmin + (Tsunset-Tmin) * np.exp(- b * (time - get_seconds(sunset_time) + 24*3600) / n1) - (time - get_seconds(sunset_time) + 24*3600) / n1 * np.exp(- b)
 
 
 def daytime_temperature_function(Tmin, Tmax, sunrise_time, sunset_time, a, c, time):
-    # function for temperature calculation between sunrise and sunset
+    """This function calculates the external temperature between sunrise and sunset.
 
+    Parameters:
+        Tmin : minimum temperature of the day.
+        Tmax : maximum temperature of the day.
+        sunrise_time : sunrise time (string with format "hh:mm:ss").
+        sunset_time : sunset time (string with format "hh:mm:ss").
+        a : lag coefficient for Tmin from noon.
+        c : time lag fro Tmin from sunrise.
+        time : time since midnight (int, in seconds).
+
+    Returns:
+        Value of the external temperature between sunrise and sunset."""
     return Tmin + (Tmax - Tmin) * np.sin(np.pi * (time) / (get_seconds(sunset_time) - get_seconds(sunrise_time) + 2 * (a - c) * 3600))
 
 
-def after_sunset_temperature_function(Tmin, Tsunset, b, n2, time):
-    # function for temperature calculation after sunset
+def after_sunset_temperature_function(Tmin, Tsunset, b, n1, time):
+    """This function calculates the external temperature after sunset.
 
-    return Tmin + (Tsunset - Tmin) * np.exp(- b * (time) / n2) - (time) / n2 * np.exp(- b)
+    Parameters:
+        Tmin : minimum temperature of the day.
+        Tsunset : temperature at sunset.
+        b : night-time temperature decay coefficient.
+        n1 : corrected night length.
+        time : time since midnight (int, in seconds).
+
+    Returns:
+        Value of the external temperature after sunset."""
+    return Tmin + (Tsunset - Tmin) * np.exp(- b * (time) / n1) - (time) / n1 * np.exp(- b)
 
 
 def one_day_temperature_calculation(Tmin, Tmax, sunrise_time, sunset_time, a=2.71, b=3.14, c=0.75):
-    # Function that calculates how the external temperature varies in one day, given certain parameters.
+    """This function calculates the external temperature in every second of a day (clear-sky model).
+
+    Parameters:
+        Tmin : minimum temperature of the day.
+        Tmax : maximum temperature of the day.
+        sunrise_time : sunrise time (string with format "hh:mm:ss").
+        sunset_time : sunset time (string with format "hh:mm:ss").
+        a : lag coefficient for Tmin from noon.
+        b : night-time temperature decay coefficient.
+        c : time lag fro Tmin from sunrise.
+
+    Returns:
+        List contanining a value of temperature per every second of the day."""
     all_day_temperatures = []
 
     # Determine initial parameters from input values
     Tsunset = daytime_temperature_function(Tmin, Tmax, sunrise_time, sunset_time, a, c, int(get_seconds(
         sunset_time) - get_seconds(sunrise_time) - c * 3600))
     n1 = get_seconds(sunrise_time) - \
-        get_seconds(sunset_time) + (c + 24) * 3600
-    # n1 and n2 are the same, since they are meant for simulations in which the parameters change as days go by. Maybe I'll need it later
-    n2 = get_seconds(sunrise_time) - \
         get_seconds(sunset_time) + (c + 24) * 3600
 
     for t in range(int(get_seconds(sunrise_time) + c * 3600)):
@@ -68,22 +132,34 @@ def one_day_temperature_calculation(Tmin, Tmax, sunrise_time, sunset_time, a=2.7
             Tmin, Tmax, sunrise_time, sunset_time, a, c, t))
     for t in range(24 * 3600 - get_seconds(sunset_time)):
         all_day_temperatures.append(
-            after_sunset_temperature_function(Tmin, Tsunset, b, n2, t))
+            after_sunset_temperature_function(Tmin, Tsunset, b, n1, t))
     return all_day_temperatures
 
 
 # Next functions are used to perform the actual simulations, given that all input parameters are externally provided or simulated using previous functions
 
 def time_to_threshold_temp(initial_t0, teq, tau, threshold_temp, interval_time):
-    # This function calculate the time needed to reach a certain threshold temperature, given the time between measurements and all the system and environmental parameters
+    """This function calculate the time needed to reach a certain threshold temperature.
 
+    Parameters:
+        initial_t0 : initial temperature of the system.
+        teq : (constant) temperature of the thermal bath.
+        tau : time constant of the system.
+        threshold_temp : threshold temperature.
+        interval_time : time between temperature variation evaluation.
+
+    Returns:
+        Value of time after which the temperature of the system reaches the threshold temperature.
+
+    Raise:
+        ValueError if the threshold temperature is beyond or equal to teq."""
     if ((initial_t0 < teq) and (threshold_temp > teq)) or ((initial_t0 > teq) and (threshold_temp < teq)):
-        raise TemperatureError(
+        raise ValueError(
             "The threshold temperature is beyond equilibrium temperature, therefore it will never be reached. Check again your parameters.")
 
     if threshold_temp == teq:
-        raise TemperatureError(
-            "The threshold temperature that was set is equal to the external temperature, meaning that it will be reached asimptotically. ")
+        raise ValueError(
+            "The threshold temperature that was set is equal to the external temperature, meaning that it will be reached asimptotically.")
 
     counter = 1
     time, temp = interval_time, initial_t0
@@ -102,15 +178,27 @@ def time_to_threshold_temp(initial_t0, teq, tau, threshold_temp, interval_time):
 
 
 def temperature_evolution_up_to_threshold(initial_t0, teq, tau, threshold_temp):
-    # This function simulates the temperature evolution as the system reaches a certain threshold temperature, given the time between measurements and all the system and environmental parameters
+    # HACK: is it ok if this version of the function doesn't allow the user to set the interval time?
+    """This function simulates the temperature evolution of the system up to a threshold temperature.
 
+    Parameters:
+        initial_t0 : initial temperature of the system.
+        teq : (constant) temperature of the thermal bath.
+        tau : time constant of the system.
+        threshold_temp : threshold temperature.
+
+    Returns:
+        List contanining a value of system temperature until threshold is reached.
+
+    Raise:
+        ValueError if the threshold temperature is beyond or equal to teq."""
     if ((initial_t0 < teq) and (threshold_temp > teq)) or ((initial_t0 > teq) and (threshold_temp < teq)):
-        raise TemperatureError(
+        raise ValueError(
             "The threshold temperature is beyond equilibrium temperature, therefore it will never be reached. Check again your parameters.")
 
     if threshold_temp == teq:
-        raise TemperatureError(
-            "The threshold temperature that was set is equal to the external temperature, meaning that it will be reached asimptotically. ")
+        raise ValueError(
+            "The threshold temperature that was set is equal to the external temperature, meaning that it will be reached asimptotically.")
 
     system_temperature = []
     system_temperature.append(initial_t0)
@@ -133,8 +221,18 @@ def temperature_evolution_up_to_threshold(initial_t0, teq, tau, threshold_temp):
 
 
 def temperature_simulation_with_clear_sky_temperature(starting_time, initial_T0, tau, duration, one_day_external_temperature):
-    # This functions simulates the thermal evolution of a system according to an external temperature simulated according to the clear-sky day model.
+    """This functions simulates the thermal evolution of a system using clear-sky day simulation as external temperature.
 
+    Parameters:
+        starting_time : daytime when the simulation starts (string with format "hh:mm:ss").
+        initial_t0 : initial temperature of the system.
+        tau : time constant of the system.
+        duration : duration of the simulation (string with format "hh:mm:ss").
+        one_day_external_temperature : list containing external temperatures
+            (generated by temperature_simulation_with_clear_sky_temperature).
+
+    Returns:
+        List with the values of the system temperature for every second of the simulation."""
     external_temperature = []
     system_temperature = []
     duration_in_seconds = get_seconds(duration)
@@ -154,7 +252,18 @@ def temperature_simulation_with_clear_sky_temperature(starting_time, initial_T0,
 
 
 def get_temperatures_from_file(file_name):
-    # This function takes the temperatures recorded by a digital thermometer, toghether with its logging_time and the duration of the recording
+    """This function imports the temperature recording of a digital thermometer and its main features.
+
+    Parameters:
+        file_name : name of the file where the recording is saved (excel file).
+
+    Returns:
+        Tuple with temperature recording, logging time and measurement duration.
+
+    Raise:
+        ValueError if the input file is not an excel file."""
+    if not file_name.endswith(".xls"):
+        raise ValueError(f"The file '{file_name}' is not a valid Excel file.")
 
     df_logging_time = pd.read_excel(
         file_name, usecols=[4], skiprows=9, nrows=1)
@@ -170,18 +279,25 @@ def get_temperatures_from_file(file_name):
 
     external_temperature_tuple = [
         temperatures, logging_time, duration_in_seconds]
-
     return external_temperature_tuple
 
 
 def temperature_simulation_with_variable_ext_temperature(initial_T0, tau, external_temperature_tuple):
-    # This function works just like temperature_simulation_with_clear_sky_temperature, but takes a tuple containing external temperatures, logging time and duration of the measurement as input
+    """This functions simulates the thermal response of a system to external temperature recording.
+
+    Parameters:
+        initial_t0 : initial temperature of the system.
+        tau : time constant of the system.
+        external_temperature_tuple : tuple containing external temperatures,
+            logging time and duration of the temperature recording.
+
+    Returns:
+        List with the values of the system temperature with the same time interval of the input recording."""
     system_temperature = []
     external_temperature, logging_time, duration_in_seconds = external_temperature_tuple
 
     system_temperature.append(initial_T0)
     t0 = initial_T0
-    # Check that this range is still ok in this function
     for i in range(duration_in_seconds//logging_time - 1):
         teq = external_temperature[i]
         system_temperature.append(exponential_func(logging_time, t0, teq, tau))
