@@ -138,7 +138,7 @@ def one_day_temperature_calculation(Tmin, Tmax, sunrise_time, sunset_time, a=2.7
 
 # Next functions are used to perform the actual simulations, given that all input parameters are externally provided or simulated using previous functions
 
-def time_to_threshold_temp(initial_t0, teq, tau, threshold_temp, interval_time):
+def time_to_threshold_temp(initial_t0, teq, tau, threshold_temp):
     """This function calculate the time needed to reach a certain threshold temperature.
 
     Parameters:
@@ -146,7 +146,6 @@ def time_to_threshold_temp(initial_t0, teq, tau, threshold_temp, interval_time):
         teq : (constant) temperature of the thermal bath.
         tau : time constant of the system.
         threshold_temp : threshold temperature.
-        interval_time : time between temperature variation evaluation.
 
     Returns:
         Value of time after which the temperature of the system reaches the threshold temperature.
@@ -161,20 +160,17 @@ def time_to_threshold_temp(initial_t0, teq, tau, threshold_temp, interval_time):
         raise ValueError(
             "The threshold temperature that was set is equal to the external temperature, meaning that it will be reached asimptotically.")
 
-    counter = 1
-    time, temp = interval_time, initial_t0
+    time, temp = 1, initial_t0
 
     if threshold_temp < teq:
         while (temp < threshold_temp):
             temp = exponential_func(time, initial_t0, teq, tau)
-            counter += 1
-            time = counter * interval_time
+            time += 1
     else:
         while (temp > threshold_temp):
             temp = exponential_func(time, initial_t0, teq, tau)
-            counter += 1
-            time = counter * interval_time
-    return time  # TODO Improve the format, maybe with a message in output
+            time += 1
+    return time
 
 
 def temperature_evolution_up_to_threshold(initial_t0, teq, tau, threshold_temp):
@@ -308,11 +304,10 @@ def temperature_simulation_with_variable_ext_temperature(initial_T0, tau, extern
 # Example of use of time_to_threshold_temperature
 """
 try:
-    print(time_to_threshold_temp(-18, 27, 1020, 25, 10))
-except TemperatureError as e:
+    print(time_to_threshold_temp(-18, 27, 1020, 25))
+except Exception as e:
     print(f"Error: {e}")
 """
-
 
 # Example of external temperature simulation
 """

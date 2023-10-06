@@ -78,16 +78,16 @@ def test_one_day_temperature_calculation():
 
 
 def test_time_to_threshold_temp():
-    # The time returned by the function must be a multiple of the time interval given (here, 10)
-    assert sim.time_to_threshold_temp(-18, 30, 1000, 25, 10) % 10 == 0
+    # The time returned by the function must be an integer
+    assert type(sim.time_to_threshold_temp(-18, 30, 1000, 25)) == int
 
     # Given the same external conditions, the time needed to reach a higher threshold temperature should be higher
-    assert (sim.time_to_threshold_temp(-20, 30, 1000, 25, 10) <
-            sim.time_to_threshold_temp(-20, 30, 1000, 28, 10)) == True
+    assert (sim.time_to_threshold_temp(-20, 30, 1000, 25) <
+            sim.time_to_threshold_temp(-20, 30, 1000, 28)) == True
 
     # The function should return the same result both for increasing and decreasing temperatures, in the same conditions
-    assert sim.time_to_threshold_temp(-20, 30, 1000, 25,
-                                      10) == sim.time_to_threshold_temp(30, -20, 1000, -15, 10)
+    assert sim.time_to_threshold_temp(-20, 30, 1000,
+                                      25) == sim.time_to_threshold_temp(30, -20, 1000, -15)
 
 
 def test_temperature_evolution_up_to_threshold():
