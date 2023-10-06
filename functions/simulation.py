@@ -103,6 +103,7 @@ def after_sunset_temperature_function(Tmin, Tsunset, b, n1, time):
 
 
 def one_day_temperature_calculation(Tmin, Tmax, sunrise_time, sunset_time, a=2.71, b=3.14, c=0.75):
+    # TODO Check the management of a, b, c parameters. Probably, better to keep them in the config
     """This function calculates the external temperature in every second of a day (clear-sky model).
 
     Parameters:
@@ -174,7 +175,6 @@ def time_to_threshold_temp(initial_t0, teq, tau, threshold_temp):
 
 
 def temperature_evolution_up_to_threshold(initial_t0, teq, tau, threshold_temp):
-    # HACK: is it ok if this version of the function doesn't allow the user to set the interval time?
     """This function simulates the temperature evolution of the system up to a threshold temperature.
 
     Parameters:
