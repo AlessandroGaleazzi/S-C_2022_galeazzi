@@ -270,10 +270,9 @@ def get_temperatures_from_file(file_name):
         df_temp_time.iloc[1:]["Unnamed: 2"])
 
     duration_in_seconds = len(temperatures) * logging_time
-
-    external_temperature_tuple = [
-        temperatures, logging_time, duration_in_seconds]
-    return external_temperature_tuple
+    """external_temperature_tuple = [
+        temperatures, logging_time, duration_in_seconds]"""
+    return (temperatures, logging_time, duration_in_seconds)
 
 
 def temperature_simulation_with_variable_ext_temperature(initial_t0, tau, external_temperature_tuple):
