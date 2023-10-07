@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
-
-# TODO Remember to check how to raise exceptions in the simulation (try and except). exceptions are written but if they are never raised they are useless!!!!
+#import matplotlib.pyplot as plt
 
 
 # The next three functions were written to be used inside the functions that actually perform the simulations
@@ -102,8 +101,7 @@ def after_sunset_temperature_function(Tmin, Tsunset, b, n1, time):
     return Tmin + (Tsunset - Tmin) * np.exp(- b * (time) / n1) - (time) / n1 * np.exp(- b)
 
 
-def one_day_temperature_calculation(Tmin, Tmax, sunrise_time, sunset_time, a=2.71, b=3.14, c=0.75):
-    # TODO Check the management of a, b, c parameters. Probably, better to keep them in the config
+def one_day_temperature_calculation(Tmin, Tmax, sunrise_time, sunset_time, a, b, c):
     """This function calculates the external temperature in every second of a day (clear-sky model).
 
     Parameters:
@@ -216,7 +214,7 @@ def temperature_evolution_up_to_threshold(initial_t0, teq, tau, threshold_temp):
     return system_temperature
 
 
-def temperature_simulation_with_clear_sky_temperature(starting_time, initial_T0, tau, duration, one_day_external_temperature):
+def temperature_simulation_with_clear_sky_temperature(starting_time, initial_t0, tau, duration, one_day_external_temperature):
     """This functions simulates the thermal evolution of a system using clear-sky day simulation as external temperature.
 
     Parameters:
@@ -238,8 +236,8 @@ def temperature_simulation_with_clear_sky_temperature(starting_time, initial_T0,
     number_of_days = duration_in_seconds // (24 * 3600) + 1
     external_temperature = one_day_external_temperature * number_of_days
 
-    system_temperature.append(initial_T0)
-    t0 = initial_T0
+    system_temperature.append(initial_t0)
+    t0 = initial_t0
     for i in range(duration_in_seconds - 1):
         teq = external_temperature[starting_time_in_seconds + i]
         system_temperature.append(every_second_exponential_func(t0, teq, tau))
@@ -278,7 +276,7 @@ def get_temperatures_from_file(file_name):
     return external_temperature_tuple
 
 
-def temperature_simulation_with_variable_ext_temperature(initial_T0, tau, external_temperature_tuple):
+def temperature_simulation_with_variable_ext_temperature(initial_t0, tau, external_temperature_tuple):
     """This functions simulates the thermal response of a system to external temperature recording.
 
     Parameters:
@@ -292,8 +290,8 @@ def temperature_simulation_with_variable_ext_temperature(initial_T0, tau, extern
     system_temperature = []
     external_temperature, logging_time, duration_in_seconds = external_temperature_tuple
 
-    system_temperature.append(initial_T0)
-    t0 = initial_T0
+    system_temperature.append(initial_t0)
+    t0 = initial_t0
     for i in range(duration_in_seconds//logging_time - 1):
         teq = external_temperature[i]
         system_temperature.append(exponential_func(logging_time, t0, teq, tau))
@@ -311,7 +309,7 @@ except Exception as e:
 
 # Example of external temperature simulation
 """
-temperatures_in_one_day = one_day_temperature_calculation(Tmin = 13, Tmax = 25, sunrise_time="6:52:00", sunset_time="19:26:00")
+temperatures_in_one_day = one_day_temperature_calculation(Tmin = 13, Tmax = 25, sunrise_time="6:52:00", sunset_time="19:26:00", a = 2.71, b = 3.14, c = 0.75)
 seconds_in_one_day = np.arange(24 * 3600)
 plt.plot(seconds_in_one_day, temperatures_in_one_day, label="Preliminary check")
 plt.xlabel("Time (s)")
