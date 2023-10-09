@@ -244,6 +244,7 @@ def temperature_simulation_with_clear_sky_temperature(starting_time, initial_t0,
         t0 = system_temperature[i + 1]
     return system_temperature
 
+# Next functions manage the simulation in case the external temperature is a recording
 
 def get_temperatures_from_file(file_name):
     """This function imports the temperature recording of a digital thermometer and its main features.
@@ -270,8 +271,6 @@ def get_temperatures_from_file(file_name):
         df_temp_time.iloc[1:]["Unnamed: 2"])
 
     duration_in_seconds = len(temperatures) * logging_time
-    """external_temperature_tuple = [
-        temperatures, logging_time, duration_in_seconds]"""
     return (temperatures, logging_time, duration_in_seconds)
 
 

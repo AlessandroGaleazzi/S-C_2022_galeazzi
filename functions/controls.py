@@ -1,7 +1,5 @@
 import simulation as sim
 import numpy as np
-import sys
-from sys import argv
 import configparser
 
 config = configparser.ConfigParser()
@@ -30,10 +28,10 @@ c = float(config.get("clear-sky_simulation", "c"))
 destination1 = config.get("paths", "temperature_threshold")
 destination2 = config.get("paths", "clear-sky_temperature")
 destination3 = config.get("paths", "clear-sky_simulation")
-destination4 = config.get("paths", "external_temperature_tuple")
-destination5 = config.get("paths", "ext_temp_simulation")
+destination4 = config.get("paths", "external_temperature")
+destination5 = config.get("paths", "ext_temperature_simulation")
 
-command = input("Select the simulation that you want to perform (time_threshold, temp_threshold, clear-sky_temp, ext_temp_import, ext_temp_simulation)\n")
+command = input("Select the simulation that you want to perform (time_threshold, temp_threshold, clear-sky_temp, clear-sky_simulation, ext_temp_import, ext_temp_simulation)\n")
 if command == "time_threshold":
     time = sim.time_to_threshold_temp(initial_t0, teq, tau, threshold_temperature)
     print(f"The selected threshold will be reached in {time} seconds.\n")
