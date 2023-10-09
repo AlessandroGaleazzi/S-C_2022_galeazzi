@@ -16,13 +16,13 @@ logging_time = int(config.get("specific parameters", "logging_time"))
 duration_in_seconds = int(config.get("specific parameters", "duration_in_seconds"))
 
 
-Tmin = float(config.get("clear-sky_simulation", "Tmin"))
-Tmax = float(config.get("clear-sky_simulation", "Tmax"))
-sunrise_time = config.get("clear-sky_simulation", "sunrise_time")
-sunset_time = config.get("clear-sky_simulation", "sunset_time")
-a = float(config.get("clear-sky_simulation", "a"))
-b = float(config.get("clear-sky_simulation", "b"))
-c = float(config.get("clear-sky_simulation", "c"))
+Tmin = float(config.get("clear-sky simulation", "Tmin"))
+Tmax = float(config.get("clear-sky simulation", "Tmax"))
+sunrise_time = config.get("clear-sky simulation", "sunrise_time")
+sunset_time = config.get("clear-sky simulation", "sunset_time")
+a = float(config.get("clear-sky simulation", "a"))
+b = float(config.get("clear-sky simulation", "b"))
+c = float(config.get("clear-sky simulation", "c"))
 
 
 destination1 = config.get("paths", "temperature_threshold")
@@ -56,7 +56,7 @@ elif command == "5":
     np.save(destination4, external_temperature_tuple[0])
     config.set("specific parameters", "logging_time", str(external_temperature_tuple[1]))
     config.set("specific parameters", "duration_in_seconds", str(external_temperature_tuple[2]))
-    print(f"The temperature reconding have been saved in {destination4} and the configuration file specific parameters have been updated\n")
+    print(f"The temperature recording has been saved in {destination4} and the specific parameters of the configuration file have been updated\n")
     with open("configuration.ini", 'w') as config_file:
             config.write(config_file)
 elif command == "6":

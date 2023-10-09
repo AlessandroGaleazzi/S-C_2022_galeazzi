@@ -1,6 +1,29 @@
 import numpy as np
 import pandas as pd
-#import matplotlib.pyplot as plt
+
+
+
+# The following function is used to prepare the final graph for the exponential fitting
+
+def find_extreme_points(point1, point2, logging_time, df_temp_time):
+    """This function returns the two points (begin and end) to be used to fit data.
+
+    Parameters:
+        point1 : measurement number from which the fit starts.
+        point2 : last measurement number fro the fit.
+        logging_time : time between measurements.
+        df_temp_time : dataframe from which temperatures and time are extracted.
+
+    Returns:
+        2x2 array containing begin and end of the fitting interval."""
+    time1, time2 = point1 * \
+        logging_time, point2 * \
+        logging_time
+    temp1 = df_temp_time.iloc[point1]["Unnamed: 2"]
+    temp2 = df_temp_time.iloc[point2]["Unnamed: 2"]
+    highlight_points = np.array(
+        [[time1, temp1], [time2, temp2]])
+    return highlight_points
 
 
 # The next three functions were written to be used inside the functions that actually perform the simulations
