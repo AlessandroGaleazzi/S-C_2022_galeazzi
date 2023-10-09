@@ -233,9 +233,13 @@ def temperature_simulation_with_clear_sky_temperature(starting_time, initial_t0,
     starting_time_in_seconds = get_seconds(starting_time)
 
     # The number of days needed is calculated in excess so that the external temperatures are available throughout the duration of the simulation
+    # HACK Old version of the code, it had a bug. TODO WRITE A TEST!!!!!!!
+    """number_of_days = duration_in_seconds // (24 * 3600) + 1 
+    external_temperature = one_day_external_temperature * number_of_days"""
     number_of_days = duration_in_seconds // (24 * 3600) + 1
-    external_temperature = one_day_external_temperature * number_of_days
-
+    for _ in range(number_of_days):
+        external_temperature.extend(one_day_external_temperature)
+    print(external_temperature)
     system_temperature.append(initial_t0)
     t0 = initial_t0
     for i in range(duration_in_seconds - 1):
