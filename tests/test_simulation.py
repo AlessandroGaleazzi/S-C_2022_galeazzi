@@ -39,7 +39,7 @@ def test_is_monotonic():
 def test_find_extreme_points():
     # This function should return two points in the temperature-time graph, namely a 2x2 array
 
-    df_temp_time_test = pd.read_excel("EFI234105840_20230801164648.xls", usecols=[
+    df_temp_time_test = pd.read_excel("EFI234105840_Exp_Fit.xls", usecols=[
                                  0, 2], skiprows=25, decimal=',')
     extremepoints = sim.find_extreme_points(
         point1 = 6626, point2 = 7660, logging_time = 10, df_temp_time = df_temp_time_test)
@@ -197,7 +197,7 @@ def test_get_temperatures_from_file():
     assert str(excinfo.value) == "The file 'not_a_proper_file.txt' is not a valid Excel file."
 
     # This function should return a tuple contanining a numpy array, an int and another int, in this order
-    result = sim.get_temperatures_from_file(file_name = "EFI234105840_20230801164648.xls")
+    result = sim.get_temperatures_from_file(file_name = "EFI234105840_Exp_Fit.xls")
     assert len(result) == 3 and isinstance(result[0], np.ndarray) and isinstance(
         result[1], int) and isinstance(result[2], int)
 
