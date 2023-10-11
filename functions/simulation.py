@@ -256,9 +256,6 @@ def temperature_simulation_with_clear_sky_temperature(starting_time, initial_t0,
     starting_time_in_seconds = get_seconds(starting_time)
 
     # The number of days needed is calculated in excess so that the external temperatures are available throughout the duration of the simulation
-    # HACK Old version of the code, it had a bug. TODO WRITE A TEST!!!!!!!
-    """number_of_days = duration_in_seconds // (24 * 3600) + 1 
-    external_temperature = one_day_external_temperature * number_of_days"""
     number_of_days = duration_in_seconds // (24 * 3600) + 1
     for _ in range(number_of_days):
         external_temperature.extend(one_day_external_temperature)
@@ -322,35 +319,3 @@ def temperature_simulation_with_variable_ext_temperature(initial_t0, tau, extern
         system_temperature.append(exponential_func(logging_time, t0, teq, tau))
         t0 = system_temperature[i + 1]
     return system_temperature
-
-
-# Example of use of time_to_threshold_temperature
-"""
-try:
-    print(time_to_threshold_temp(-18, 27, 1020, 25))
-except Exception as e:
-    print(f"Error: {e}")
-"""
-
-# Example of external temperature simulation
-"""
-temperatures_in_one_day = one_day_temperature_calculation(Tmin = 13, Tmax = 25, sunrise_time="6:52:00", sunset_time="19:26:00", a = 2.71, b = 3.14, c = 0.75)
-seconds_in_one_day = np.arange(24 * 3600)
-plt.plot(seconds_in_one_day, temperatures_in_one_day, label="Preliminary check")
-plt.xlabel("Time (s)")
-plt.ylabel("Temperature (°C)")
-plt.title("24 hours temperature variation")
-plt.show()
-"""
-
-# Example of use and plotting of temperature_simulation_with_variable_ext_temperature
-"""
-temperatures_in_one_day = one_day_temperature_calculation(Tmin = 13, Tmax = 25, sunrise_time="6:52:00", sunset_time="19:26:00")
-system_temperature = temperature_simulation_with_variable_ext_temperature("00:00:00", -18, 10000, "24:00:00", temperatures_in_one_day)
-seconds_in_one_day = np.arange(24 * 3600)
-plt.plot(seconds_in_one_day, temperatures_in_one_day, system_temperature, label="Preliminary check")
-plt.xlabel("Time (s)")
-plt.ylabel("Temperature (°C)")
-plt.title("24 hours temperature variation")
-plt.show()
-"""
