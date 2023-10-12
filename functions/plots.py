@@ -62,6 +62,7 @@ def clear_sky_simulation_plot():
     plt.plot(time, clear_sky_simulation, label="System temperature")
     command = input("Do you want to also add the external temperature from which the simulation is performed to the plot? y/n\n")
     if command == "y":
+        # FIXME This plot has to show the whole ext temp throughout the duration of the simulation, at the moment is does not!!! You need to "synchronize" the two arrays
         clear_sky_temperature = np.load(source2)
         plt.plot(time, clear_sky_temperature, label="External temperature")
     elif command == "n":
@@ -100,7 +101,7 @@ def external_temperature_simulation_plot():
     time = [i * logging_time for i in range(duration_in_seconds // logging_time)]
     f = plt.figure(figsize=(18, 12))
     plt.plot(time, external_temperature_simulation, label="System temperature")
-    command = input("Do you want to also add the external temperature from which the simulation is performed to the plot y/n\n")
+    command = input("Do you want to also add the external temperature from which the simulation is performed to the plot? y/n\n")
     if command == "y":
         external_temperature = np.load(source4, allow_pickle=True)
         plt.plot(time, external_temperature, label="External temperature")

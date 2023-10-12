@@ -259,7 +259,6 @@ def temperature_simulation_with_clear_sky_temperature(starting_time, initial_t0,
     number_of_days = duration_in_seconds // (24 * 3600) + 1
     for _ in range(number_of_days):
         external_temperature.extend(one_day_external_temperature)
-    print(external_temperature)
     system_temperature.append(initial_t0)
     t0 = initial_t0
     for i in range(duration_in_seconds - 1):
