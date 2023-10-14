@@ -1,9 +1,5 @@
 from setuptools import setup
 
-with open("requirements.txt") as requirements_file:
-    requirements = requirements_file.readlines()
-    requirements = [x[:-1] for x in requirements]
-
 setup(
     name="Thermal simulation project",
     version="1.0.0",
@@ -12,5 +8,13 @@ setup(
     author_email = "alessandro.galeazzi3@studio.unibo.it",
     url = "https://github.com/AlessandroGaleazzi/S-C_2022_galeazzi",
     packages=["functions"],
-    install_requires=requirements
+    install_requires=[
+        "configparser",
+        "matplotlib",
+        "numpy",
+        "scipy",
+        "pandas",
+        "pytest",
+        "pytest-cov",
+    ],
 )
