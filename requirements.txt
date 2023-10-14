@@ -1,0 +1,7 @@
+configparser
+matplotlib
+numpy
+scipy
+pandas
+pytest
+pytest-cov
