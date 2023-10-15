@@ -20,7 +20,7 @@ temperatures, logging_time = file_tuple[0], file_tuple[1]
 time = np.arange(len(
     temperatures)) * logging_time
 
-# Consider raising an exception if the numbers are beyond the data length
+# Save the temperatures needed for the fit
 
 highlight_points = sim.find_extreme_points(
     point1, point2, logging_time, df_temp_time)
@@ -69,7 +69,8 @@ if command == "y":
     
     command = input("Type y if you want to set this value of the tau parameter in the configuration file, otherwise type any other character\n")
     if command == "y":
-        config.set("fundamental parameters", "tau", str(tau))
+        tau_rounded = round(tau, 2)
+        config.set("fundamental parameters", "tau", str(tau_rounded))
         print(f"The tau parameter calculated from {file_name} has ben saved in the configuration file\n")
         with open("configuration.ini", 'w') as config_file:
             config.write(config_file)
