@@ -1,9 +1,18 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import configparser
+import argparse
+
+parser = argparse.ArgumentParser(description="Launch one or more simulations.")
+parser.add_argument("ConfigFile", nargs="?", default="configuration.ini", help="Select the configuration file.")
+parser.add_argument("plots", nargs='+', choices=["plot1", "plot2", "plot3y", "plot3n", "plot4", "plot5n", "plot5y"], help="Select the desired plot.")
+
+args = parser.parse_args()
+chosen_configfile = args.ConfigFile
+chosen_plots = args.plots
 
 config = configparser.ConfigParser()
-config.read("configuration.ini")
+config.read(chosen_configfile)
 
 threshold = float(config.get("specific parameters", "threshold_temperature"))
 logging_time = int(config.get("specific parameters", "logging_time"))
@@ -60,22 +69,32 @@ def clear_sky_simulation_plot():
     time = np.arange(len(clear_sky_simulation))
     f = plt.figure(figsize=(18, 12))
     plt.plot(time, clear_sky_simulation, label="System temperature")
-    command = input("Do you want to also add the external temperature from which the simulation is performed to the plot? y/n\n")
-    if command == "y":
-        temperatures_24h = np.load(source2)
-        simulation_duration = len(clear_sky_simulation)
-        repetitions = simulation_duration // len(temperatures_24h)
-        ext_temperature = np.tile(temperatures_24h, repetitions)
-        remaining_seconds = simulation_duration - len(ext_temperature)
-        if remaining_seconds > 0:
-            ext_temperature = np.concatenate((ext_temperature, temperatures_24h[:remaining_seconds]))
-        # The following line would be the only test needed for previous 7 lines
-        assert len(ext_temperature) == len(clear_sky_simulation)
-        plt.plot(time, ext_temperature, label="External temperature")
-    elif command == "n":
-        pass
-    else:
-        print("Invalid command")
+    plt.xlabel("Time (s)", fontsize=30)
+    plt.xticks(fontsize=20)
+    plt.ylabel("Temperature (°C)", fontsize=30)
+    plt.yticks(fontsize=20)
+    plt.title(label="Temperature with clear-sky model", fontsize = 40)
+    plt.legend(fontsize=20)
+    plt.axis("tight")
+    f.savefig(destination3)
+    print(f"The plot has been saved as {destination3} in the plots folder.")
+
+def clear_sky_simulation_temperature_plot():
+    """This function plots the thermal simulation of a system exposed to clear-sky temperatures and the external one."""
+    clear_sky_simulation = np.load(source3)
+    time = np.arange(len(clear_sky_simulation))
+    f = plt.figure(figsize=(18, 12))
+    plt.plot(time, clear_sky_simulation, label="System temperature")
+    temperatures_24h = np.load(source2)
+    simulation_duration = len(clear_sky_simulation)
+    repetitions = simulation_duration // len(temperatures_24h)
+    ext_temperature = np.tile(temperatures_24h, repetitions)
+    remaining_seconds = simulation_duration - len(ext_temperature)
+    if remaining_seconds > 0:
+        ext_temperature = np.concatenate((ext_temperature, temperatures_24h[:remaining_seconds]))
+    # The following line would be the only test needed for previous 7 lines
+    assert len(ext_temperature) == len(clear_sky_simulation)
+    plt.plot(time, ext_temperature, label="External temperature")
     plt.xlabel("Time (s)", fontsize=30)
     plt.xticks(fontsize=20)
     plt.ylabel("Temperature (°C)", fontsize=30)
@@ -108,14 +127,24 @@ def external_temperature_simulation_plot():
     time = [i * logging_time for i in range(duration_in_seconds // logging_time)]
     f = plt.figure(figsize=(18, 12))
     plt.plot(time, external_temperature_simulation, label="System temperature")
-    command = input("Do you want to also add the external temperature from which the simulation is performed to the plot? y/n\n")
-    if command == "y":
-        external_temperature = np.load(source4, allow_pickle=True)
-        plt.plot(time, external_temperature, label="External temperature")
-    elif command == "n":
-        pass
-    else:
-        print("Invalid command")
+    plt.xlabel("Time (s)", fontsize=30)
+    plt.xticks(fontsize=20)
+    plt.ylabel("Temperature (°C)", fontsize=30)
+    plt.yticks(fontsize=20)
+    plt.title(label="Temperature simulation from external temperature recording", fontsize = 40)
+    plt.legend(fontsize=20)
+    plt.axis("tight")
+    f.savefig(destination5)
+    print(f"The plot has been saved as {destination5} in the plots folder.")
+
+def external_temperature_simulation_with_ext_plot():
+    """This function plots the thermal simulation of a system exposed to recorded temperatures."""
+    external_temperature_simulation = np.load(source5)
+    time = [i * logging_time for i in range(duration_in_seconds // logging_time)]
+    f = plt.figure(figsize=(18, 12))
+    plt.plot(time, external_temperature_simulation, label="System temperature")
+    external_temperature = np.load(source4, allow_pickle=True)
+    plt.plot(time, external_temperature, label="External temperature")
     plt.xlabel("Time (s)", fontsize=30)
     plt.xticks(fontsize=20)
     plt.ylabel("Temperature (°C)", fontsize=30)
@@ -127,7 +156,23 @@ def external_temperature_simulation_plot():
     print(f"The plot has been saved as {destination5} in the plots folder.")
 
 
-command = input("Select the plot that you want to perform, using the following numbers:\n"
+for plot in chosen_plots:
+    if plot == "plot1":
+        threshold_temp_plot()
+    elif plot == "plot2":
+        clear_sky_temperature_plot()
+    elif plot == "plot3n":
+        clear_sky_simulation_plot()
+    elif plot == "plot3y":
+        clear_sky_simulation_temperature_plot()
+    elif plot == "plot4":
+        external_temperature_plot()
+    elif plot == "plot5n":
+        external_temperature_simulation_plot()
+    elif plot == "plot5y": 
+        external_temperature_simulation_with_ext_plot()
+
+"""command = input("Select the plot that you want to perform, using the following numbers:\n"
                 "Temperature evolution up to threshold -> 1\nClear-sky temperature -> 2\n"
                 "Simulation with clear-sky temperature -> 3\nExternal temperature recording -> 4\n"
                 "Simulation with external temperature recording -> 5\n")
@@ -142,4 +187,4 @@ elif command == "4":
 elif command == "5":
     external_temperature_simulation_plot()
 else:
-    print("Invalid command")
+    print("Invalid command")"""
