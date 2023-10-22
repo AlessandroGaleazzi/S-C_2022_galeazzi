@@ -1,11 +1,15 @@
+# This script contains all the functions and commands to launch the simulations
+
 import simulation as sim
 import numpy as np
 import configparser
 import argparse
 
 parser = argparse.ArgumentParser(description="Launch one or more simulations.")
-parser.add_argument("ConfigFile", nargs="?", default="configuration.ini", help="Select the configuration file.")
-parser.add_argument("simulations", nargs='+', choices=["sim1", "sim2", "sim3", "sim4", "sim5", "sim6"], help="Select the simulations to launch.")
+parser.add_argument("ConfigFile", nargs="?", default="configuration.ini", \
+                    help="Select the configuration file.")
+parser.add_argument("simulations", nargs='+', choices=["sim1", "sim2", "sim3", "sim4", "sim5", "sim6"], \
+                          help="Select the simulations to launch.")
 
 args = parser.parse_args()
 chosen_configfile = args.ConfigFile

@@ -1,3 +1,5 @@
+# This script contains all the functions and commands to plot the results of the simulations
+
 import numpy as np
 import matplotlib.pyplot as plt
 import configparser
@@ -5,7 +7,8 @@ import argparse
 
 parser = argparse.ArgumentParser(description="Launch one or more simulations.")
 parser.add_argument("ConfigFile", nargs="?", default="configuration.ini", help="Select the configuration file.")
-parser.add_argument("plots", nargs='+', choices=["plot1", "plot2", "plot3y", "plot3n", "plot4", "plot5n", "plot5y"], help="Select the desired plot.")
+parser.add_argument("plots", nargs='+', choices=["plot1", "plot2", "plot3y", "plot3n", "plot4", "plot5n", "plot5y"], \
+                     help="Select the desired plot.")
 
 args = parser.parse_args()
 chosen_configfile = args.ConfigFile
@@ -171,20 +174,4 @@ for plot in chosen_plots:
         external_temperature_simulation_plot()
     elif plot == "plot5y": 
         external_temperature_simulation_with_ext_plot()
-
-"""command = input("Select the plot that you want to perform, using the following numbers:\n"
-                "Temperature evolution up to threshold -> 1\nClear-sky temperature -> 2\n"
-                "Simulation with clear-sky temperature -> 3\nExternal temperature recording -> 4\n"
-                "Simulation with external temperature recording -> 5\n")
-if command == "1":
-    threshold_temp_plot()
-elif command == "2":
-    clear_sky_temperature_plot()
-elif command == "3":
-    clear_sky_simulation_plot()
-elif command == "4":
-    external_temperature_plot()
-elif command == "5":
-    external_temperature_simulation_plot()
-else:
-    print("Invalid command")"""
+        

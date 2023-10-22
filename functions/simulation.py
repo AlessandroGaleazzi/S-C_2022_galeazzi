@@ -1,6 +1,7 @@
+# This script contains all the functions used in the simulations
+
 import numpy as np
 import pandas as pd
-
 
 
 # The following function is used to prepare the final graph for the exponential fitting
@@ -9,10 +10,10 @@ def find_extreme_points(point1, point2, logging_time, df_temp_time):
     """This function returns the two points (begin and end) to be used to fit data.
 
     Parameters:
-        point1 : measurement number from which the fit starts.
-        point2 : last measurement number fro the fit.
-        logging_time : time between measurements.
-        df_temp_time : dataframe from which temperatures and time are extracted.
+        point1 : excel cell containing the measurement number from which the fit starts.
+        point2 : excel cell containing the last measurement number for the fit.
+        logging_time : excel cell containing the time interval between measurements.
+        df_temp_time : dataframe derived from excel from which temperatures and time are extracted.
 
     Returns:
         2x2 array containing begin and end of the fitting interval."""
@@ -74,7 +75,7 @@ def every_second_exponential_func(t0, teq, tau):
     return teq + (t0-teq)*np.exp(-1/tau)
 
 
-# The next four functions are used to produce a simulation of external temperatures in a day, according to the clear-sky model
+# The next four functions produce a simulation of external temperatures according to the clear-sky model
 
 def before_sunrise_temperature_function(Tmin, Tsunset, sunset_time, b, n1, time):
     """This function calculates the external temperature before sunrise.
@@ -89,7 +90,8 @@ def before_sunrise_temperature_function(Tmin, Tsunset, sunset_time, b, n1, time)
 
     Returns:
         Value of the external temperature before sunrise."""
-    return Tmin + (Tsunset-Tmin) * np.exp(- b * (time - get_seconds(sunset_time) + 24*3600) / n1) - (time - get_seconds(sunset_time) + 24*3600) / n1 * np.exp(- b)
+    return Tmin + (Tsunset-Tmin) * np.exp(- b * (time - get_seconds(sunset_time) + 24*3600) / n1) \
+          - (time - get_seconds(sunset_time) + 24*3600) / n1 * np.exp(- b)
 
 
 def daytime_temperature_function(Tmin, Tmax, sunrise_time, sunset_time, a, c, time):
@@ -106,7 +108,8 @@ def daytime_temperature_function(Tmin, Tmax, sunrise_time, sunset_time, a, c, ti
 
     Returns:
         Value of the external temperature between sunrise and sunset."""
-    return Tmin + (Tmax - Tmin) * np.sin(np.pi * (time) / (get_seconds(sunset_time) - get_seconds(sunrise_time) + 2 * (a - c) * 3600))
+    return Tmin + (Tmax - Tmin) * np.sin(np.pi * (time) / \
+            (get_seconds(sunset_time) - get_seconds(sunrise_time) + 2 * (a - c) * 3600))
 
 
 def after_sunset_temperature_function(Tmin, Tsunset, b, n1, time):
@@ -158,7 +161,7 @@ def one_day_temperature_calculation(Tmin, Tmax, sunrise_time, sunset_time, a, b,
     return all_day_temperatures
 
 
-# Next functions are used to perform the actual simulations, given that all input parameters are externally provided or simulated using previous functions
+# Next functions are used to perform the actual simulations, given that all input parameters are provided
 
 def time_to_threshold_temp(initial_t0, teq, tau, threshold_temp):
     """This function calculate the time needed to reach a certain threshold temperature.
@@ -176,22 +179,29 @@ def time_to_threshold_temp(initial_t0, teq, tau, threshold_temp):
         ValueError if the threshold temperature is beyond or equal to teq."""
     if ((initial_t0 < teq) and (threshold_temp > teq)) or ((initial_t0 > teq) and (threshold_temp < teq)):
         raise ValueError(
-            "The threshold temperature is beyond equilibrium temperature, therefore it will never be reached. Check again your parameters.")
+            "The threshold temperature is beyond equilibrium temperature, therefore it will never be reached. \
+                  Check again your parameters.")
 
     if threshold_temp == teq:
         raise ValueError(
-            "The threshold temperature that was set is equal to the external temperature, meaning that it will be reached asimptotically.")
+            "The threshold temperature that was set is equal to the external temperature, \
+                meaning that it will be reached asimptotically.")
 
     time, temp = 1, initial_t0
 
-    if threshold_temp < teq:
+    while (temp < threshold_temp) if threshold_temp < teq else (temp > threshold_temp):
+        temp = exponential_func(time, initial_t0, teq, tau)
+        time += 1
+
+    # Old version of the code 
+    """if threshold_temp < teq:
         while (temp < threshold_temp):
             temp = exponential_func(time, initial_t0, teq, tau)
             time += 1
     else:
         while (temp > threshold_temp):
             temp = exponential_func(time, initial_t0, teq, tau)
-            time += 1
+            time += 1"""
     return time
 
 
@@ -211,17 +221,32 @@ def temperature_evolution_up_to_threshold(initial_t0, teq, tau, threshold_temp):
         ValueError if the threshold temperature is beyond or equal to teq."""
     if ((initial_t0 < teq) and (threshold_temp > teq)) or ((initial_t0 > teq) and (threshold_temp < teq)):
         raise ValueError(
-            "The threshold temperature is beyond equilibrium temperature, therefore it will never be reached. Check again your parameters.")
+            "The threshold temperature is beyond equilibrium temperature, therefore it will never be reached. \
+                Check again your parameters.")
 
     if threshold_temp == teq:
         raise ValueError(
-            "The threshold temperature that was set is equal to the external temperature, meaning that it will be reached asimptotically.")
+            "The threshold temperature that was set is equal to the external temperature, \
+                meaning that it will be reached asimptotically.")
 
     system_temperature = []
     system_temperature.append(initial_t0)
     t0, temp = initial_t0, initial_t0
     counter = 0
 
+    while True:
+        temp = every_second_exponential_func(t0, teq, tau)
+        system_temperature.append(temp)
+        t0 = system_temperature[counter + 1]
+        counter += 1
+        if (temp < threshold_temp and system_temperature[counter - 1] >= threshold_temp) or \
+            (temp > threshold_temp and system_temperature[counter - 1] <= threshold_temp):
+            break
+    
+    # Old version of the code 
+    """if (temp < threshold_temp and system_temperature[counter - 1] >= threshold_temp) or \
+            (temp > threshold_temp and system_temperature[counter - 1] <= threshold_temp):
+        break
     if threshold_temp < teq:
         while (temp < threshold_temp):
             temp = every_second_exponential_func(t0, teq, tau)
@@ -233,7 +258,7 @@ def temperature_evolution_up_to_threshold(initial_t0, teq, tau, threshold_temp):
             temp = every_second_exponential_func(t0, teq, tau)
             system_temperature.append(temp)
             t0 = system_temperature[counter + 1]
-            counter += 1
+            counter += 1"""
     return system_temperature
 
 
@@ -255,7 +280,7 @@ def temperature_simulation_with_clear_sky_temperature(starting_time, initial_t0,
     duration_in_seconds = get_seconds(duration)
     starting_time_in_seconds = get_seconds(starting_time)
 
-    # The number of days needed is calculated in excess so that the external temperatures are available throughout the duration of the simulation
+    # The number of days needed is calculated in excess so that the external temperatures are available as long as needed
     number_of_days = duration_in_seconds // (24 * 3600) + 1
     for _ in range(number_of_days):
         external_temperature.extend(one_day_external_temperature)

@@ -1,3 +1,5 @@
+# This script contains the tests of all functions defined in the other scripts
+
 import functions.simulation as sim
 import numpy as np
 import pandas as pd

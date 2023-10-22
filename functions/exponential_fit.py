@@ -1,12 +1,22 @@
+# This script contains the procedure to perform an exponential fit to find the tau parameter
+
 import simulation as sim
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 from scipy.optimize import curve_fit
 import configparser
+import argparse
+
+parser = argparse.ArgumentParser(description="Launch and exponential fit.")
+parser.add_argument("ConfigFile", nargs="?", default="configuration.ini", \
+                    help="Select the configuration file.")
+
+args = parser.parse_args()
+chosen_configfile = args.ConfigFile
 
 config = configparser.ConfigParser()
-config.read("configuration.ini")
+config.read(chosen_configfile)
 
 file_name = config.get("exponential fit", "file_name")
 point1 = int(config.get("exponential fit", "point1"))
@@ -30,7 +40,7 @@ time_for_fit = np.arange(len(
     temperatures_for_fit)) * logging_time
 
 
-# The following step of the fit is meant to let the user check that the chosen fitting interval is correct by plotting it
+# The following plotting of the fit is meant to let the user check that the chosen fitting interval is correct
 
 plt.plot(time, temperatures, label="Preliminary check")
 for point in highlight_points:
@@ -53,7 +63,6 @@ if command == "y":
 
     temperatures_from_fitting = sim.exponential_func(
         time_for_fit, T0, Teq, tau)
-
 
     # Exponential fit and comparison with experimental data
     
