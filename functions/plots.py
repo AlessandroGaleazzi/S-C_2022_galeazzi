@@ -6,9 +6,11 @@ import configparser
 import argparse
 
 parser = argparse.ArgumentParser(description="Launch one or more simulations.")
-parser.add_argument("ConfigFile", nargs="?", default="configuration.ini", help="Select the configuration file.")
-parser.add_argument("plots", nargs='+', choices=["plot1", "plot2", "plot3y", "plot3n", "plot4", "plot5n", "plot5y"], \
-                     help="Select the desired plot.")
+parser.add_argument("ConfigFile", nargs="?", default="configuration.ini", \
+                    help="Select the configuration file.")
+parser.add_argument("plots", nargs='+', \
+                    choices=["plot1", "plot2", "plot3y", "plot3n", "plot4", "plot5n", "plot5y"], \
+                    help="Select the desired plot.")
 
 args = parser.parse_args()
 chosen_configfile = args.ConfigFile
@@ -83,7 +85,7 @@ def clear_sky_simulation_plot():
     print(f"The plot has been saved as {destination3} in the plots folder.")
 
 def clear_sky_simulation_temperature_plot():
-    """This function plots the thermal simulation of a system exposed to clear-sky temperatures and the external one."""
+    """This function plots the temperature evolution with clear-sky external temperatures (also plotted)."""
     clear_sky_simulation = np.load(source3)
     time = np.arange(len(clear_sky_simulation))
     f = plt.figure(figsize=(18, 12))

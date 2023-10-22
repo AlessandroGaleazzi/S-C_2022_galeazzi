@@ -27,7 +27,7 @@ def find_extreme_points(point1, point2, logging_time, df_temp_time):
     return highlight_points
 
 
-# The next three functions were written to be used inside the functions that actually perform the simulations
+# The next three functions are used inside the functions that actually perform the simulations
 
 def get_seconds(time_str):
     """This function transforms a time in format hh:mm:ss into a time measured in seconds.
@@ -75,7 +75,7 @@ def every_second_exponential_func(t0, teq, tau):
     return teq + (t0-teq)*np.exp(-1/tau)
 
 
-# The next four functions produce a simulation of external temperatures according to the clear-sky model
+# Next four functions produce a simulation of external temperature according to the clear-sky model
 
 def before_sunrise_temperature_function(Tmin, Tsunset, sunset_time, b, n1, time):
     """This function calculates the external temperature before sunrise.
@@ -144,8 +144,8 @@ def one_day_temperature_calculation(Tmin, Tmax, sunrise_time, sunset_time, a, b,
     all_day_temperatures = []
 
     # Determine initial parameters from input values
-    Tsunset = daytime_temperature_function(Tmin, Tmax, sunrise_time, sunset_time, a, c, int(get_seconds(
-        sunset_time) - get_seconds(sunrise_time) - c * 3600))
+    Tsunset = daytime_temperature_function(Tmin, Tmax, sunrise_time, sunset_time, a, c, \
+        int(get_seconds(sunset_time) - get_seconds(sunrise_time) - c * 3600))
     n1 = get_seconds(sunrise_time) - \
         get_seconds(sunset_time) + (c + 24) * 3600
 
@@ -161,7 +161,7 @@ def one_day_temperature_calculation(Tmin, Tmax, sunrise_time, sunset_time, a, b,
     return all_day_temperatures
 
 
-# Next functions are used to perform the actual simulations, given that all input parameters are provided
+# Next functions perform the actual simulations, given that all input parameters are provided
 
 def time_to_threshold_temp(initial_t0, teq, tau, threshold_temp):
     """This function calculate the time needed to reach a certain threshold temperature.
@@ -177,15 +177,16 @@ def time_to_threshold_temp(initial_t0, teq, tau, threshold_temp):
 
     Raise:
         ValueError if the threshold temperature is beyond or equal to teq."""
-    if ((initial_t0 < teq) and (threshold_temp > teq)) or ((initial_t0 > teq) and (threshold_temp < teq)):
+    if ((initial_t0 < teq) and (threshold_temp > teq)) or \
+        ((initial_t0 > teq) and (threshold_temp < teq)):
         raise ValueError(
-            "The threshold temperature is beyond equilibrium temperature, therefore it will never be reached. \
-                  Check again your parameters.")
+            "The threshold temperature is beyond equilibrium temperature, \
+        therefore it will never be reached. Check again your parameters.")
 
     if threshold_temp == teq:
         raise ValueError(
-            "The threshold temperature that was set is equal to the external temperature, \
-                meaning that it will be reached asimptotically.")
+            "The threshold temperature that was set is equal to the \
+        external temperature, meaning that it will be reached asimptotically.")
 
     time, temp = 1, initial_t0
 
@@ -219,15 +220,16 @@ def temperature_evolution_up_to_threshold(initial_t0, teq, tau, threshold_temp):
 
     Raise:
         ValueError if the threshold temperature is beyond or equal to teq."""
-    if ((initial_t0 < teq) and (threshold_temp > teq)) or ((initial_t0 > teq) and (threshold_temp < teq)):
+    if ((initial_t0 < teq) and (threshold_temp > teq)) or \
+        ((initial_t0 > teq) and (threshold_temp < teq)):
         raise ValueError(
-            "The threshold temperature is beyond equilibrium temperature, therefore it will never be reached. \
-                  Check again your parameters.")
+            "The threshold temperature is beyond equilibrium temperature, \
+        therefore it will never be reached. Check again your parameters.")
 
     if threshold_temp == teq:
         raise ValueError(
-            "The threshold temperature that was set is equal to the external temperature, \
-                meaning that it will be reached asimptotically.")
+            "The threshold temperature that was set is equal to the \
+        external temperature, meaning that it will be reached asimptotically.")
 
     system_temperature = []
     system_temperature.append(initial_t0)
@@ -262,8 +264,9 @@ def temperature_evolution_up_to_threshold(initial_t0, teq, tau, threshold_temp):
     return system_temperature
 
 
-def temperature_simulation_with_clear_sky_temperature(starting_time, initial_t0, tau, duration, one_day_external_temperature):
-    """This functions simulates the thermal evolution of a system using clear-sky day simulation as external temperature.
+def temperature_simulation_with_clear_sky_temperature(starting_time, initial_t0, tau, \
+                                                      duration, one_day_external_temperature):
+    """This functions simulates the system evolution using external clear-sky day temperatures.
 
     Parameters:
         starting_time : daytime when the simulation starts (string with format "hh:mm:ss").
@@ -280,7 +283,8 @@ def temperature_simulation_with_clear_sky_temperature(starting_time, initial_t0,
     duration_in_seconds = get_seconds(duration)
     starting_time_in_seconds = get_seconds(starting_time)
 
-    # The number of days needed is calculated in excess so that the external temperatures are available as long as needed
+    # The number of days needed is calculated in excess so that \
+    # the external temperatures are available as long as needed
     number_of_days = duration_in_seconds // (24 * 3600) + 1
     for _ in range(number_of_days):
         external_temperature.extend(one_day_external_temperature)
@@ -332,7 +336,7 @@ def temperature_simulation_with_variable_ext_temperature(initial_t0, tau, extern
             logging time and duration of the temperature recording.
 
     Returns:
-        List with the values of the system temperature with the same time interval of the input recording."""
+        List with the system temperatures, with the same time interval of the input recording."""
     system_temperature = []
     external_temperature, logging_time, duration_in_seconds = external_temperature_tuple
 

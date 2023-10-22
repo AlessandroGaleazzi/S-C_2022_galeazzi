@@ -40,7 +40,7 @@ time_for_fit = np.arange(len(
     temperatures_for_fit)) * logging_time
 
 
-# The following plotting of the fit is meant to let the user check that the chosen fitting interval is correct
+# The following plotting of the fit lets the user check that the chosen fitting interval is correct
 
 plt.plot(time, temperatures, label="Preliminary check")
 for point in highlight_points:
@@ -50,7 +50,8 @@ plt.ylabel("Temperature (°C)")
 plt.title("Time constant calculation")
 plt.show()
 command = input("This is the fitting interval that was selected from the exponential fit.\n"
-"Type y if you want to go on with the fit, otherwise type n to stop the process and change the parameters.\n")
+"Type y if you want to go on with the fit, \
+    otherwise type n to stop the process and change the parameters.\n")
 
 
 if command == "y":
@@ -66,7 +67,8 @@ if command == "y":
 
     # Exponential fit and comparison with experimental data
     
-    plt.scatter(time_for_fit, temperatures_for_fit, label='Experimental data', color='blue', marker='o', s=20)
+    plt.scatter(time_for_fit, temperatures_for_fit, label='Experimental data', \
+                color='blue', marker='o', s=20)
     plt.plot(time_for_fit, temperatures_from_fitting, 'r', label="Exponential fit")
     plt.xlabel('Time (s)')
     plt.ylabel('Temperature (°C)')
@@ -76,11 +78,12 @@ if command == "y":
     plt.show()
     print(f"The exponential fit calculated tau={tau:.2f}s")
     
-    command = input("Type y if you want to set this value of the tau parameter in the configuration file, otherwise type any other character\n")
+    command = input("Type y if you want to set this value of the tau parameter \
+                    in the configuration file, otherwise type any other character\n")
     if command == "y":
         tau_rounded = round(tau, 2)
         config.set("fundamental parameters", "tau", str(tau_rounded))
-        print(f"The tau parameter calculated from {file_name} has ben saved in the configuration file\n")
+        print(f"The tau parameter calculated in {file_name} was saved in the configuration file\n")
         with open("configuration.ini", 'w') as config_file:
             config.write(config_file)
     else:
