@@ -3,7 +3,7 @@
 The project can be downloaded from this repository and can be run from the command line. First of all, it is important to know the content of every file:
 
 - The file [requirements.txt](https://github.com/AlessandroGaleazzi/S-C_2022_galeazzi/blob/main/requirements.txt) contains a list of the dependencies needed by the project
-- In the folder [tests](https://github.com/AlessandroGaleazzi/S-C_2022_galeazzi/tree/main/tests), the user can find the file [test_simulation.py](https://github.com/AlessandroGaleazzi/S-C_2022_galeazzi/blob/main/tests/test_simulation.py), where the functions written in [simulation.py](https://github.com/AlessandroGaleazzi/S-C_2022_galeazzi/blob/main/functions/simulation.py) are tested. It is important to run the tests from this folder with the command ***"pytest test_simulation.py"***, since the tests rely on an the excel file that is stored in the same folder.
+- In the folder [tests](https://github.com/AlessandroGaleazzi/S-C_2022_galeazzi/tree/main/tests), the user can find the file [test_simulation.py](https://github.com/AlessandroGaleazzi/S-C_2022_galeazzi/blob/main/tests/test_simulation.py), where the functions written in [simulation.py](https://github.com/AlessandroGaleazzi/S-C_2022_galeazzi/blob/main/functions/simulation.py) are tested. It is important to run the tests from this folder with the command ***"pytest test_simulation.py"***, since the tests relies on a relative path from that folder.
 - The folders [data](https://github.com/AlessandroGaleazzi/S-C_2022_galeazzi/tree/main/data) and [plots](https://github.com/AlessandroGaleazzi/S-C_2022_galeazzi/tree/main/plots) contain the results of all the possible simulations (as .npy files) and plots (as .png files), respectively.
 - The folder [input](https://github.com/AlessandroGaleazzi/S-C_2022_galeazzi/tree/main/input) contains the input datasheets from which temperatures recordings can be used.
 
@@ -14,7 +14,7 @@ The folder [functions](https://github.com/AlessandroGaleazzi/S-C_2022_galeazzi/t
 - In the file [configuration.ini](https://github.com/AlessandroGaleazzi/S-C_2022_galeazzi/blob/main/functions/configuration.ini), all the parameters of the simulation can be set (later on this).
 - In the file [simulation.py](https://github.com/AlessandroGaleazzi/S-C_2022_galeazzi/blob/main/functions/simulation.py), all the function used in this project are defined.
 - In the file [exponential_fit.py](https://github.com/AlessandroGaleazzi/S-C_2022_galeazzi/blob/main/functions/exponential_fit.py), it is possible to calculate the ***&tau;*** parameter starting from a proper temperature recording and to set it in the [configuration.ini](https://github.com/AlessandroGaleazzi/S-C_2022_galeazzi/blob/main/functions/configuration.ini), if wanted.
-- In the file [controls,py](https://github.com/AlessandroGaleazzi/S-C_2022_galeazzi/blob/main/functions/controls.py), all the simulations can be launched and saved.
+- In the file [controls.py](https://github.com/AlessandroGaleazzi/S-C_2022_galeazzi/blob/main/functions/controls.py), all the simulations can be launched and saved.
 - In the file [plots.py](https://github.com/AlessandroGaleazzi/S-C_2022_galeazzi/blob/main/functions/plots.py), the results of saved simulations can be plotted.
 
 # How-to guides
@@ -25,7 +25,7 @@ In order to test the performances of a thermal container, the user needs to perf
 
 ### How to simulate
 
-All the simulations are performed calling the file [controls.py](https://github.com/AlessandroGaleazzi/S-C_2022_galeazzi/blob/main/functions/controls.py) with the command ***"python3 controls.py --configuration file name-- --simulations to be performed--***, and providing the configuration file name from which to take the parameters together with the simulations wanted. In particular,
+All the simulations are performed calling the file [controls.py](https://github.com/AlessandroGaleazzi/S-C_2022_galeazzi/blob/main/functions/controls.py) with the command ***"python3 controls.py --configuration file name-- --simulations to be performed--"***, and providing the configuration file name from which to take the parameters together with the simulations wanted (for instance, ***"python3 controls.py configuration.ini sim1 sim2 sim5"***). In particular,
 
 1) ***"sim1"*** will calculate the time (in seconds) that the system needs to reach a certain threshold temperature.
 2) ***"sim2"*** will return the temperature evolution of the system during every second until the threshold temperature is reached.
@@ -41,12 +41,11 @@ Before launching the simulation, it is important to check that all the required 
  3) ***"Simulation with clear-sky temperature"*** (No. 4) requires the parameters ***starting_time***, ***initial_t0***, ***tau***, ***duration***, and must be performed after a ***"clear-sky temperature"*** simulation (No. 3).
  4) ***"Import of an external temperature recording"*** (No. 5) requires the parameter ***file_name***, and will also update the parameters ***logging_time*** and ***duration_in_seconds***.
  5) ***"Simulation with external temperature recording"*** (No. 6) requires the parameters provided by ***"Import of an external temperature recording"*** (No. 5), together with ***initial_t0*** and ***tau***.
- 6) 
 The same holds for other configuration files that the user might want to use.
 
 ### How to plot
 
-Once the required simulation has been performed, it is possible to plot the results calling the file [plots.py](https://github.com/AlessandroGaleazzi/S-C_2022_galeazzi/blob/main/functions/plots.py) with the command ***"python3 plots.py --configuration file name-- --simulations to be performed--"***, and providing the configuration file name from which to take the parameters together with the plots wanted. In particular,
+Once the required simulation has been performed, it is possible to plot the results calling the file [plots.py](https://github.com/AlessandroGaleazzi/S-C_2022_galeazzi/blob/main/functions/plots.py) with the command ***"python3 plots.py --configuration file name-- --simulations to be performed--"***, and providing the configuration file name from which to take the parameters together with the plots wanted (for instance, ***"python3 plots.py configuration.ini plot1 plot3y plot5n"***). In particular,
 
 1) ***"plot1"*** will plot the temperature evolution up to the threshold temperature simulated with ***"Temperature evolution up to threshold"***.
 2) ***"plot2"*** will plot the clear-sky temperature simulated with ***"Clear-sky temperature"***.
@@ -65,7 +64,7 @@ This projects contains some excel datasheets that are meant to show examples of 
 - The file *EFI234105840_Ext_Temp_Recording.xls* contains an example of external temperature recording, from which a simulation can be performed
 
 In these datasheets, we are mainly interested in the ***time*** and ***temperature*** recordings (columns B and C, from raw 27) and in the ***logging time*** of the recording (E:11). 
-The project relies on this kind of input data to calculate ***&tau;*** parameters and to perform simulation based on external temperatures recordings, together with  a very particular kind of external temperature simulation (last section).
+The project relies on this kind of input data to calculate ***&tau;*** parameters and to perform simulation based on external temperatures recordings, together with a very particular kind of external temperature simulation called *clear-sky model* (last section).
 
 
 # Thermal evolution of a system with negligible internal resistance
