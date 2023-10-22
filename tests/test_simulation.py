@@ -8,7 +8,14 @@ import pytest
 # REMEMBER TO RUN THE TESTS FROM THE FOLDER "TESTS", OTHERWISE THE TESTS THAT REQUIRE AN EXCEL FILE FAIL
 
 def is_monotonic(list):
-    # This function assesses if a list is monotonic. I wrote it to perform a test in this script
+    """This function assesses if a list is monotonic. I wrote it to perform a test in this script.
+
+    Parameters:
+        list: list to be tested.
+
+    Returns:
+        True if the list is monotonic.
+        False if the list is not monotonic."""
     increasing = decreasing = True
 
     if len(list) == 0:
@@ -21,47 +28,77 @@ def is_monotonic(list):
             increasing = False
         if list[i] > list[i - 1]:
             decreasing = False
-
     return increasing or decreasing
 
-def test_is_monotonic():
-    # Test that exceptions are raised correctly
+def test_is_monotonic_empty_list():
+    """Test that an empty list raises the corresponding exception."""
     with pytest.raises(ValueError) as excinfo:  
         is_monotonic([])  
     assert str(excinfo.value) == "The list is empty"
+
+def test_is_monotonic_one_element_list():
+    """Test that a list with one element raises the corresponding exception."""
     with pytest.raises(ValueError) as excinfo:  
         is_monotonic([5])  
     assert str(excinfo.value) == "The list contains one element and cannot be defined monotonic"
 
-    # Test two ordinary cases
+def test_is_monotonic_increasing_list():
+    """Test that a list with increasing values returns True."""
     assert is_monotonic([1, 3, 7, 10]) == True
+
+def test_is_monotonic_decreasing_list():
+    """Test that a list with decreasing values returns True."""
     assert is_monotonic([10, 7, 3, 1]) == True
+
+def test_is_monotonic_not_monotonic_list():
+    """Test that a not monotonic list returns False."""
     assert is_monotonic([1, 10, 79, 8]) == False
 
-def test_find_extreme_points():
-    # This function should return two points in the temperature-time graph, namely a 2x2 array
+def test_is_monotonic_two_equal_values():
+    """Test that the function returns true also with a not-strictly decreasing or increasing list."""
+    assert is_monotonic([1, 1, 3, 7]) == is_monotonic([8, 6, 6, 3]) == True
 
-    df_temp_time_test = pd.read_excel("EFI234105840_Exp_Fit.xls", usecols=[
+
+def test_find_extreme_points():
+    """Test that a known files returns the values the function was designed to return."""
+    df_temp_time_test = pd.read_excel("../input/EFI234105840_Exp_Fit.xls", usecols=[
                                  0, 2], skiprows=25, decimal=',')
     extremepoints = sim.find_extreme_points(
         point1 = 6626, point2 = 7660, logging_time = 10, df_temp_time = df_temp_time_test)
-    assert extremepoints.shape == (2, 2)
+    assert (extremepoints[0][0] == 66260) and (extremepoints[0][1] == -18) and \
+        (extremepoints[1][0] == 76600) and (extremepoints[1][1] == 27.3)
 
-    # The times corresponding to extreme points must be multiples of the logging time (in this case, 10)
+def test_find_extreme_points_times_are_log_time_multiples():
+    """Test that extreme points time is multiple of the logging time (in this case, 10)."""
+    df_temp_time_test = pd.read_excel("../input/EFI234105840_Exp_Fit.xls", usecols=[
+                                 0, 2], skiprows=25, decimal=',')
+    extremepoints = sim.find_extreme_points(
+        point1 = 6626, point2 = 7660, logging_time = 10, df_temp_time = df_temp_time_test)
     assert (extremepoints[0, 0] % 10 == 0) and (
         extremepoints[1, 0] % 10 == 0)
 
-def test_get_seconds():
-    # Test that the exception is raised correctly
+
+def test_get_seconds_invalid_string():
+    """Test that a string containing anything but digits and colons raises the corresponding exception."""
     with pytest.raises(ValueError) as excinfo:  
         sim.get_seconds("00:10:1o")  
     assert str(excinfo.value) == "Invalid character in time format. Only digits and colons are allowed."
 
-    # Midnight should always return 0 seconds
+def test_get_seconds_midnight():
+    """Midnight should always return 0 seconds"""
     assert sim.get_seconds(time_str = "00:00:00") == 0
 
-    # Ordinary case testing
-    assert sim.get_seconds(time_str = "01:00:00") == 3600
+def test_get_seconds_seconds_part():
+    """Test that the part of the string that cointains seconds is transformed correctly."""
+    assert sim.get_seconds(time_str = "00:00:53") == 53
+
+def test_get_seconds_minutes_part():
+    """Test that the part of the string that cointains minutes is transformed correctly."""
+    assert sim.get_seconds(time_str = "00:15:00") == 900
+
+def test_get_seconds_minutes_part():
+    """Test that the part of the string that cointains hours is transformed correctly."""
+    assert sim.get_seconds(time_str = "24:00:00") == 86400
 
 
 def test_exponential_func():
@@ -121,11 +158,13 @@ def test_time_to_threshold_temp():
     # Test that the exceptions are raised correctly
     with pytest.raises(ValueError) as excinfo:  
         sim.time_to_threshold_temp(initial_t0 = -18, teq = 30, tau = 1000, threshold_temp = 30)  
-    assert str(excinfo.value) == "The threshold temperature that was set is equal to the external temperature, meaning that it will be reached asimptotically."
+    assert str(excinfo.value) == "The threshold temperature that was set is equal to the external temperature, \
+                meaning that it will be reached asimptotically."
 
     with pytest.raises(ValueError) as excinfo:
         sim.time_to_threshold_temp(initial_t0 = -18, teq = 20, tau = 1000, threshold_temp = 25)
-    assert str(excinfo.value) == "The threshold temperature is beyond equilibrium temperature, therefore it will never be reached. Check again your parameters."
+    assert str(excinfo.value) == "The threshold temperature is beyond equilibrium temperature, therefore it will never be reached. \
+                  Check again your parameters."
 
     # The time returned by the function must be an integer
     assert type(sim.time_to_threshold_temp(initial_t0 = -18, teq = 30, tau = 1000, threshold_temp = 25)) == int
@@ -143,11 +182,13 @@ def test_temperature_evolution_up_to_threshold():
     # Test that the exceptions are raised correctly
     with pytest.raises(ValueError) as excinfo:  
         sim.temperature_evolution_up_to_threshold(initial_t0 = -18, teq = 30, tau = 1000, threshold_temp = 30)  
-    assert str(excinfo.value) == "The threshold temperature that was set is equal to the external temperature, meaning that it will be reached asimptotically."
+    assert str(excinfo.value) == "The threshold temperature that was set is equal to the external temperature, \
+                meaning that it will be reached asimptotically."
 
     with pytest.raises(ValueError) as excinfo:
         sim.temperature_evolution_up_to_threshold(initial_t0 = -18, teq = 20, tau = 1000, threshold_temp = 25)
-    assert str(excinfo.value) == "The threshold temperature is beyond equilibrium temperature, therefore it will never be reached. Check again your parameters."
+    assert str(excinfo.value) == "The threshold temperature is beyond equilibrium temperature, therefore it will never be reached. \
+                  Check again your parameters."
 
     # Given the same external conditions, the list returned by simulation performed to reach a higher threshold temperature should be higher
     assert (len(sim.temperature_evolution_up_to_threshold(initial_t0 = -20, teq = 30, tau = 1000, threshold_temp = 25)) <
@@ -199,7 +240,7 @@ def test_get_temperatures_from_file():
     assert str(excinfo.value) == "The file 'not_a_proper_file.txt' is not a valid Excel file."
 
     # This function should return a tuple contanining a numpy array, an int and another int, in this order
-    result = sim.get_temperatures_from_file(file_name = "EFI234105840_Exp_Fit.xls")
+    result = sim.get_temperatures_from_file(file_name = "../input/EFI234105840_Exp_Fit.xls")
     assert len(result) == 3 and isinstance(result[0], np.ndarray) and isinstance(
         result[1], int) and isinstance(result[2], int)
 

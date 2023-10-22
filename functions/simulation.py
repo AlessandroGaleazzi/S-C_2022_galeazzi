@@ -222,7 +222,7 @@ def temperature_evolution_up_to_threshold(initial_t0, teq, tau, threshold_temp):
     if ((initial_t0 < teq) and (threshold_temp > teq)) or ((initial_t0 > teq) and (threshold_temp < teq)):
         raise ValueError(
             "The threshold temperature is beyond equilibrium temperature, therefore it will never be reached. \
-                Check again your parameters.")
+                  Check again your parameters.")
 
     if threshold_temp == teq:
         raise ValueError(
